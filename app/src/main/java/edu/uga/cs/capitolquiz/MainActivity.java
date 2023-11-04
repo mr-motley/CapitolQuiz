@@ -2,7 +2,10 @@ package edu.uga.cs.capitolquiz;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,7 +21,26 @@ public class MainActivity extends AppCompatActivity {
         img.setBackgroundResource(R.drawable.usmap);
         TextView intro = findViewById(R.id.textView2);
         intro.setText(welcomeMsg);
+        Button startQuiz = findViewById(R.id.button2);
+        Button viewResults = findViewById(R.id.button);
 
+        startQuiz.setOnClickListener(new startOnClickListener());
+        viewResults.setOnClickListener(new resOnClickListener());
+    }
 
+    private class startOnClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(view.getContext(), QuizActivity.class);
+            view.getContext().startActivity(intent);
+        }
+    }
+
+    private class resOnClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(view.getContext(), ResultsActivity.class);
+            view.getContext().startActivity(intent);
+        }
     }
 }

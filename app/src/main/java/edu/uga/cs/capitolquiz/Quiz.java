@@ -2,13 +2,13 @@ package edu.uga.cs.capitolquiz;
 
 public class Quiz {
     private long id;
-    private long result;
-    private long q1State;
-    private long q2State;
-    private long q3State;
-    private long q4State;
-    private long q5State;
-    private long q6State;
+    private int result;
+    private int q1State;
+    private int q2State;
+    private int q3State;
+    private int q4State;
+    private int q5State;
+    private int q6State;
     private String quizDate;
 
     public Quiz(){
@@ -23,12 +23,12 @@ public class Quiz {
         this.q6State = -1;
     }
 
-    public Quiz(Long result, String quizDate){
+    public Quiz(int result, String quizDate){
         this.id = -1;
         this.result = result;
         this.quizDate = quizDate;
     }
-    public Quiz(Long result, String quizDate, long[] states){
+    public Quiz(int result, String quizDate, int[] states){
         this.id = -1;
         this.result = result;
         this.quizDate = quizDate;
@@ -42,23 +42,23 @@ public class Quiz {
 
     public long getId() {return id;}
     public void setId(long id){this.id = id;}
-    public long getResult() {return result;}
-    public void setResult(long result) {this.result =result;}
+    public int getResult() {return result;}
+    public void setResult(int result) {this.result =result;}
 
     public String getQuizDate() {return quizDate;}
     public void setQuizDate(String quizDate) {this.quizDate = quizDate;}
-    public long getQ1State() {return q1State;}
-    public void setQ1State(long q1){ this.q1State = q1;}
-    public long getQ2State() {return q2State;}
-    public void setQ2State(long q2){ this.q2State = q2;}
-    public long getQ3State() {return q3State;}
-    public void setQ3State(long q3){ this.q3State = q3;}
-    public long getQ4State() {return q4State;}
-    public void setQ4State(long q4){ this.q4State = q4;}
-    public long getQ5State() {return q5State;}
-    public void setQ5State(long q5){ this.q5State = q5;}
-    public long getQ6State() {return q6State;}
-    public void setQ6State(long q6){ this.q6State = q6;}
+    public int getQ1State() {return q1State;}
+    public void setQ1State(int q1){ this.q1State = q1;}
+    public int getQ2State() {return q2State;}
+    public void setQ2State(int q2){ this.q2State = q2;}
+    public int getQ3State() {return q3State;}
+    public void setQ3State(int q3){ this.q3State = q3;}
+    public int getQ4State() {return q4State;}
+    public void setQ4State(int q4){ this.q4State = q4;}
+    public int getQ5State() {return q5State;}
+    public void setQ5State(int q5){ this.q5State = q5;}
+    public int getQ6State() {return q6State;}
+    public void setQ6State(int q6){ this.q6State = q6;}
 
 
     public String toString(){
