@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="2"
+    android:gravity="center"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -20,7 +22,49 @@
 
     <ImageView
         android:id="@+id/imageView"
+        android:layout_width="350dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="75dp"
+        android:adjustViewBounds="true"
+        android:cropToPadding="false"
+        android:scaleType="center" />
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@tools:sample/avatars" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingTop="75dp">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="TextView" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="25dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Take Quiz!" />
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="25dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Past Quizzes" />
+        </LinearLayout>
+
+    </LinearLayout>
 </LinearLayout>

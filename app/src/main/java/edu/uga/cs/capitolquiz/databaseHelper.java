@@ -123,7 +123,7 @@ public class databaseHelper extends SQLiteOpenHelper {
      * @throws SQLException
      */
     public void openDB() throws SQLException {
-        String myPath = DB_PATH + DB_NAME;
+        String myPath = DB_PATH + DB_NAME + ".sql";
         stateDB = SQLiteDatabase.openDatabase(myPath,null,SQLiteDatabase.OPEN_READWRITE);
     }
 
