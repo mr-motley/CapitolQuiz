@@ -33,6 +33,12 @@ public class databaseHelper extends SQLiteOpenHelper {
     public static final String QUIZZES_COLUMN_ID = "id";
     public static final String QUIZZES_COLUMN_QUIZDATE = "quizDate";
     public static final String QUIZZES_COLUMN_RESULT = "result";
+    public static final String QUIZZES_COULUMN_Q1STATE = "q1State";
+    public static final String QUIZZES_COULUMN_Q2STATE = "q2State";
+    public static final String QUIZZES_COULUMN_Q3STATE = "q3State";
+    public static final String QUIZZES_COULUMN_Q4STATE = "q4State";
+    public static final String QUIZZES_COULUMN_Q5STATE = "q5State";
+    public static final String QUIZZES_COULUMN_Q6STATE = "q6State";
     public static final String TB_QUIZZES = "quizes";
 
     private SQLiteDatabase stateDB;

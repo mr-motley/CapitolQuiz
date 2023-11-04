@@ -140,6 +140,13 @@ public class stateInfoData {
         ContentValues values = new ContentValues();
         values.put(databaseHelper.QUIZZES_COLUMN_QUIZDATE, quiz.getQuizDate());
         values.put(databaseHelper.QUIZZES_COLUMN_RESULT, quiz.getResult());
+        values.put(databaseHelper.QUIZZES_COULUMN_Q1STATE, quiz.getQ1State());
+        values.put(databaseHelper.QUIZZES_COULUMN_Q2STATE,quiz.getQ2State());
+        values.put(databaseHelper.QUIZZES_COULUMN_Q3STATE,quiz.getQ3State());
+        values.put(databaseHelper.QUIZZES_COULUMN_Q4STATE,quiz.getQ4State());
+        values.put(databaseHelper.QUIZZES_COULUMN_Q5STATE,quiz.getQ5State());
+        values.put(databaseHelper.QUIZZES_COULUMN_Q6STATE,quiz.getQ6State());
+
 
         //Insert new row into DB table
         long id = stateDB.insert(databaseHelper.TB_QUIZZES,null, values);
