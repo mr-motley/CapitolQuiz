@@ -16,7 +16,7 @@ import java.io.OutputStream;
 public class databaseHelper extends SQLiteOpenHelper {
     public static String DB_PATH = "/data/data/edu.uga.cs.capitolquiz/databases/";
 
-    public static String DB_NAME = "StateCapitols";
+    public static String DB_NAME = "StateCapitols.sqlite";
 
     public static final int DB_VERSION = 1;
 
@@ -123,7 +123,7 @@ public class databaseHelper extends SQLiteOpenHelper {
      * @throws SQLException
      */
     public void openDB() throws SQLException {
-        String myPath = DB_PATH + DB_NAME + ".sql";
+        String myPath = DB_PATH + DB_NAME;
         stateDB = SQLiteDatabase.openDatabase(myPath,null,SQLiteDatabase.OPEN_READWRITE);
     }
 

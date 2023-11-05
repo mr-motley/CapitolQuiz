@@ -62,6 +62,6 @@ public class Quiz {
 
 
     public String toString(){
-        return id + ": " + result + " " + quizDate;
+        return id + ": " + result + " " + q1State+ " " + q2State+ " " +q3State+ " " +q4State+ " " +q5State+ " " +q6State+ " " + quizDate;
     }
 }

@@ -1,18 +1,28 @@
 package edu.uga.cs.capitolquiz;
 
+import static com.google.android.material.internal.ContextUtils.getActivity;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 public class QuizActivity extends AppCompatActivity {
 
+    public final String DEBUG_TAG = "QuizActiviy: ";
+    public int score = -1;
+    public Quiz current;
+    private stateInfoData stateInfoData = null;
+    private List<State> statesList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,10 +32,17 @@ public class QuizActivity extends AppCompatActivity {
         quest.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         quest.setAdapter(qpAdapter);
 
-        Quiz current = generateQuiz();
+        statesList = new ArrayList<State>();
 
+        stateInfoData = new stateInfoData(getActivity());
+
+        stateInfoData.open();
+
+
+        current = generateQuiz();
+        Log.d(DEBUG_TAG, "Generated Quiz:" + current);
+        score = 0;
     }
-
     public Quiz generateQuiz() {
         int[] stateVal = new int[6];
         Random gen = new Random();
@@ -55,5 +72,21 @@ public class QuizActivity extends AppCompatActivity {
         Quiz temp = new Quiz(0,strDate, stateVal);
 
         return temp;
+    }
+    private class stateDBReader extends AsyncTask<Void, List<State>>{
+        @Override
+        protected List<State> doInBackground(Void... params){
+            List<State> statesList = stateInfoData.retrieveAllStates();
+
+            Log.d(DEBUG_TAG, "stateDBRearder: States Retrieved " +statesList.size());
+
+            return statesList;
+        }
+
+        @Override
+        protected void onPostExecute(List<State> stateList){
+            Log.d(DEBUG_TAG, "StateDBReader: stateList.size(): " + stateList.size());
+            statesList.addAll(stateList);
+        }
     }
 }

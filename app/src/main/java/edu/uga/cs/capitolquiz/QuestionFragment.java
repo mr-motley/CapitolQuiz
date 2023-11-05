@@ -63,6 +63,6 @@ public class QuestionFragment extends Fragment {
 
     }
     public static int getQuestionNum() {
-        return 6;
+        return 7;
     }
 }

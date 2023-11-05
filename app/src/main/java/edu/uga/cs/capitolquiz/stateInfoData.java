@@ -105,16 +105,29 @@ public class stateInfoData {
                 while (cursor.moveToNext()) {
 
                     if (cursor.getColumnCount() >= 3){
+                        int[] temp = new int[6];
                         //get attributes of the quiz object
                         columnIndex = cursor.getColumnIndex(databaseHelper.QUIZZES_COLUMN_ID);
                         long id = cursor.getLong(columnIndex);
                         columnIndex = cursor.getColumnIndex(databaseHelper.QUIZZES_COLUMN_QUIZDATE);
                         String quizDate = cursor.getString(columnIndex);
                         columnIndex = cursor.getColumnIndex(databaseHelper.QUIZZES_COLUMN_RESULT);
-                        long result = cursor.getLong(columnIndex);
+                        int result = cursor.getInt(columnIndex);
+                        columnIndex = cursor.getColumnIndex(databaseHelper.QUIZZES_COULUMN_Q1STATE);
+                        temp[0] = cursor.getInt(columnIndex);
+                        columnIndex = cursor.getColumnIndex(databaseHelper.QUIZZES_COULUMN_Q2STATE);
+                        temp[1] = cursor.getInt(columnIndex);
+                        columnIndex = cursor.getColumnIndex(databaseHelper.QUIZZES_COULUMN_Q3STATE);
+                        temp[2] = cursor.getInt(columnIndex);
+                        columnIndex = cursor.getColumnIndex(databaseHelper.QUIZZES_COULUMN_Q4STATE);
+                        temp[3] = cursor.getInt(columnIndex);
+                        columnIndex = cursor.getColumnIndex(databaseHelper.QUIZZES_COULUMN_Q5STATE);
+                        temp[4] = cursor.getInt(columnIndex);
+                        columnIndex = cursor.getColumnIndex(databaseHelper.QUIZZES_COULUMN_Q6STATE);
+                        temp[5] = cursor.getInt(columnIndex);
 
                         //create new Quiz object and fill with retrieved values
-                        Quiz quiz = new Quiz(result,quizDate);
+                        Quiz quiz = new Quiz(result,quizDate,temp);
                         quiz.setId(id);
                         quizzes.add(quiz);
                         Log.d(DEBUG_TAG,"Retrieved Quiz: " + quiz);
