@@ -9,10 +9,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String welcomeMsg = "Welcome, to begin a quiz select 'start quiz', to view past results select 'past quizzes'. Each quiz consists of 6 questions where you will be asked to select the capitol of a given state from three options. Once you have made your selection, swipe left to submit your answer";
 
+    private databaseHelper dbHelp = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +26,14 @@ public class MainActivity extends AppCompatActivity {
         intro.setText(welcomeMsg);
         Button startQuiz = findViewById(R.id.button2);
         Button viewResults = findViewById(R.id.button);
+
+        dbHelp = new databaseHelper(getApplicationContext());
+
+        try {
+            dbHelp.createDatabase();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         startQuiz.setOnClickListener(new startOnClickListener());
         viewResults.setOnClickListener(new resOnClickListener());

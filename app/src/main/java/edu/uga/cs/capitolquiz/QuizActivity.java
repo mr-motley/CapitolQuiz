@@ -8,6 +8,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class QuizActivity extends AppCompatActivity {
     public Quiz current;
     private stateInfoData stateInfoData = null;
     private List<State> statesList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,9 +36,8 @@ public class QuizActivity extends AppCompatActivity {
 
         statesList = new ArrayList<State>();
 
-        stateInfoData = new stateInfoData(getActivity());
 
-        stateInfoData.open();
+
 
 
         current = generateQuiz();

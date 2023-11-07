@@ -61,6 +61,8 @@ public class QuestionFragment extends Fragment {
         RadioButton ans2 = view.findViewById(R.id.radioButton2);
         RadioButton ans3 = view.findViewById(R.id.radioButton3);
 
+
+
     }
     public static int getQuestionNum() {
         return 7;
