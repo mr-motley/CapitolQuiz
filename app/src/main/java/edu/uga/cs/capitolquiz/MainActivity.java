@@ -26,15 +26,6 @@ public class MainActivity extends AppCompatActivity {
         intro.setText(welcomeMsg);
         Button startQuiz = findViewById(R.id.button2);
         Button viewResults = findViewById(R.id.button);
-
-        dbHelp = new databaseHelper(getApplicationContext());
-
-        try {
-            dbHelp.createDatabase();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         startQuiz.setOnClickListener(new startOnClickListener());
         viewResults.setOnClickListener(new resOnClickListener());
     }

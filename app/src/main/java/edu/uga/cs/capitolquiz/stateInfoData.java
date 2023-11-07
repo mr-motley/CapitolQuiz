@@ -2,11 +2,18 @@ package edu.uga.cs.capitolquiz;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.opencsv.CSVReader;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +21,7 @@ import java.util.List;
 public class stateInfoData {
     public static final String DEBUG_TAG = "stateInfoData";
 
-    private SQLiteDatabase stateDB;
+    private SQLiteDatabase db;
 
     private SQLiteOpenHelper dbHelper;
 
@@ -23,9 +30,6 @@ public class stateInfoData {
             databaseHelper.STATEINFO_COLUMN_CAPITOL,
             databaseHelper.STATEINFO_COLUMN_SECONDCITY,
             databaseHelper.STATEINFO_COLUMN_THIRDCITY,
-            databaseHelper.STATEINFO_COLUMN_STATEHOOD,
-            databaseHelper.STATEINFO_COLUMN_CAPITOLSINCE,
-            databaseHelper.STATEINFO_COLUMN_SIZERANK,
             databaseHelper.STATEINFO_COLUMN_ID
     };
 
@@ -39,21 +43,40 @@ public class stateInfoData {
         this.dbHelper = databaseHelper.getInstance(context);
     }
 
+    public void open() {
+        db = dbHelper.getWritableDatabase();
+        Log.d(DEBUG_TAG, "stateInfoData: db open");
+    }
+
+    public void close() {
+        if(dbHelper != null){
+            dbHelper.close();
+            Log.d(DEBUG_TAG, "stateInfoData: db closed");
+        }
+    }
+
+    public boolean isDBOpen() {
+        return db.isOpen();
+    }
+
+
     public List<State> retrieveAllStates() {
+        Log.d(DEBUG_TAG, "Begin Retrieval");
         ArrayList<State> states = new ArrayList<>();
         Cursor cursor = null;
         int columnIndex;
-
         try {
             //Select query on stateInfo table
-            cursor = stateDB.query(databaseHelper.TB_STATEINFO,allColumns,
+            cursor = db.query(databaseHelper.TB_STATEINFO,allColumns,
                     null,null,null,null,null,null);
 
             if(cursor != null && cursor.getCount() > 0){
                 while(cursor.moveToNext()){
 
-                    if(cursor.getColumnCount() >= 8){
+                    if(cursor.getColumnCount() >= 5){
                         //get all attributes of the state
+                        columnIndex = cursor.getColumnIndex(databaseHelper.STATEINFO_COLUMN_ID);
+                        long id = cursor.getLong(columnIndex);
                         columnIndex = cursor.getColumnIndex(databaseHelper.STATEINFO_COLUMN_STATE);
                         String stateName = cursor.getString(columnIndex);
                         columnIndex = cursor.getColumnIndex(databaseHelper.STATEINFO_COLUMN_CAPITOL);
@@ -62,19 +85,12 @@ public class stateInfoData {
                         String secondCity = cursor.getString(columnIndex);
                         columnIndex = cursor.getColumnIndex(databaseHelper.STATEINFO_COLUMN_THIRDCITY);
                         String thirdCity = cursor.getString(columnIndex);
-                        columnIndex = cursor.getColumnIndex(databaseHelper.STATEINFO_COLUMN_STATEHOOD);
-                        long statehood = cursor.getLong(columnIndex);
-                        columnIndex = cursor.getColumnIndex(databaseHelper.STATEINFO_COLUMN_CAPITOLSINCE);
-                        long capitolSince = cursor.getLong(columnIndex);
-                        columnIndex = cursor.getColumnIndex(databaseHelper.STATEINFO_COLUMN_SIZERANK);
-                        long sizeRank = cursor.getLong(columnIndex);
-                        columnIndex = cursor.getColumnIndex(databaseHelper.STATEINFO_COLUMN_ID);
-                        long id = cursor.getLong(columnIndex);
 
-                        State state = new State(stateName,capitol,secondCity,thirdCity,statehood,capitolSince,sizeRank);
+                        Log.d(DEBUG_TAG, "creating State Object");
+                        State state = new State(stateName,capitol,secondCity,thirdCity);
                         state.setId(id);
                         states.add(state);
-                        Log.d(DEBUG_TAG, "Retrieved state: " + state);
+                        //Log.d(DEBUG_TAG, "Retrieved state: " + state);
                     }
                 }
             }
@@ -86,11 +102,13 @@ public class stateInfoData {
         } catch(Exception e) {
             Log.d(DEBUG_TAG, "Exception caught: " + e);
         } finally{
-            //close cursor to avoid data leaks
+            //close cursor
             if(cursor != null){
                 cursor.close();
             }
         }
+        //return list of states
+        Log.d(DEBUG_TAG, "Returning List of States");
         return states;
     }
 
@@ -100,7 +118,7 @@ public class stateInfoData {
         int columnIndex;
         try {
             //execute select query
-            cursor = stateDB.query(databaseHelper.TB_QUIZZES, allColumns, null,null,null,null,null);
+            cursor = db.query(databaseHelper.TB_QUIZZES, allColumns, null,null,null,null,null);
             if(cursor != null && cursor.getCount() > 0){
                 while (cursor.moveToNext()) {
 
@@ -162,7 +180,7 @@ public class stateInfoData {
 
 
         //Insert new row into DB table
-        long id = stateDB.insert(databaseHelper.TB_QUIZZES,null, values);
+        long id = db.insert(databaseHelper.TB_QUIZZES,null, values);
 
         quiz.setId(id);
 
@@ -171,5 +189,24 @@ public class stateInfoData {
         return quiz;
     }
 
+    public void populateDB(Context context) {
+        Log.d(DEBUG_TAG, "Inserting Initial Values: ");
+        try {
+            InputStream in_s = context.getAssets().open("StateCapitals.csv");
+            CSVReader reader = new CSVReader(new InputStreamReader(in_s));
+            String[] nextRow;
+            while( (nextRow = reader.readNext() ) != null){
+                ContentValues cv = new ContentValues();
+                cv.put(databaseHelper.STATEINFO_COLUMN_STATE, nextRow[0].trim());
+                cv.put(databaseHelper.STATEINFO_COLUMN_CAPITOL, nextRow[1].trim());
+                cv.put(databaseHelper.STATEINFO_COLUMN_SECONDCITY, nextRow[2].trim());
+                cv.put(databaseHelper.STATEINFO_COLUMN_THIRDCITY, nextRow[3].trim());
+                db.insert(databaseHelper.TB_STATEINFO, null, cv);
+            }
+        } catch (Exception e){
+            Log.d(DEBUG_TAG, "csv read unsuccessful: " + e.getMessage());
+        }
 
+
+    }
 }

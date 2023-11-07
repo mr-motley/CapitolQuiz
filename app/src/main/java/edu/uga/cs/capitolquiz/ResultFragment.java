@@ -64,10 +64,15 @@ public class ResultFragment extends Fragment {
         TextView res = view.findViewById(R.id.textView5);
         Button ret = view.findViewById(R.id.button3);
         ret.setOnClickListener(new returnOnClickListener());
-        int result = qz.score;
+        int result = 0;
+        for(int i = 0; i < qz.answers.length; i++){
+            result += qz.answers[i];
+        }
         res.setText("Result: " + result + "/6");
         Log.d(DEBUG_TAG, "Quiz Value: " + qz.current);
-        new quizDBWriter().execute(qz.current);
+//        stateInfoData = new stateInfoData(getActivity());
+//        stateInfoData.open();
+//        new quizDBWriter().execute(qz.current);
     }
 
     private class returnOnClickListener implements View.OnClickListener {
@@ -90,4 +95,5 @@ public class ResultFragment extends Fragment {
         quizList.add(quiz);
         }
     }
+
 }

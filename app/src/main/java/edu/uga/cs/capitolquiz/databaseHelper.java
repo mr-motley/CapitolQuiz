@@ -1,36 +1,42 @@
 package edu.uga.cs.capitolquiz;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 
 public class databaseHelper extends SQLiteOpenHelper {
-    public static String DB_PATH = "/data/data/edu.uga.cs.capitolquiz/databases/";
 
-    public static String DB_NAME = "StateCapitols.sqlite";
+
+    private static final String DEBUG_TAG = "databaseHelper";
+
+    public static String DB_NAME = "StateCapitols.db";
 
     public static final int DB_VERSION = 1;
 
+    private Context context1;
+
     //Column Name Definitions
-    public static final String STATEINFO_COLUMN_ID = "id";
+    public static final String STATEINFO_COLUMN_ID = "_id";
     public static final String STATEINFO_COLUMN_STATE= "state";
     public static final String STATEINFO_COLUMN_CAPITOL = "capitol";
     public static final String STATEINFO_COLUMN_SECONDCITY = "secondCity";
     public static final String STATEINFO_COLUMN_THIRDCITY = "thirdCity";
-    public static final String STATEINFO_COLUMN_STATEHOOD = "statehood";
-    public static final String STATEINFO_COLUMN_CAPITOLSINCE = "capitolSince";
-    public static final String STATEINFO_COLUMN_SIZERANK = "sizeRank";
     public static final String TB_STATEINFO = "stateInfo";
-    public static final String QUIZZES_COLUMN_ID = "id";
+    public static final String QUIZZES_COLUMN_ID = "_id";
     public static final String QUIZZES_COLUMN_QUIZDATE = "quizDate";
     public static final String QUIZZES_COLUMN_RESULT = "result";
     public static final String QUIZZES_COULUMN_Q1STATE = "q1State";
@@ -39,110 +45,107 @@ public class databaseHelper extends SQLiteOpenHelper {
     public static final String QUIZZES_COULUMN_Q4STATE = "q4State";
     public static final String QUIZZES_COULUMN_Q5STATE = "q5State";
     public static final String QUIZZES_COULUMN_Q6STATE = "q6State";
-    public static final String TB_QUIZZES = "quizes";
+    public static final String TB_QUIZZES = "quizzes";
 
-    private SQLiteDatabase stateDB;
     private static databaseHelper helperInstance;
-    private Context context;
-    public databaseHelper(Context context) {
-        super(context,DB_NAME,null,DB_VERSION);
-        this.context = context;
+
+    //method to create sql table
+    private static final String CREATE_STATES =
+            "create table " + TB_STATEINFO + " ("
+            + STATEINFO_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + STATEINFO_COLUMN_STATE + " TEXT, "
+            + STATEINFO_COLUMN_CAPITOL + " TEXT, "
+            + STATEINFO_COLUMN_SECONDCITY + " TEXT, "
+            + STATEINFO_COLUMN_THIRDCITY + " TEXT "
+            + ")";
+
+    private static final String CREATE_QUIZZES =
+            "create table " + TB_QUIZZES + " ("
+                    + QUIZZES_COLUMN_ID+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + QUIZZES_COLUMN_QUIZDATE + " TEXT, "
+                    + QUIZZES_COLUMN_RESULT + " INTEGER, "
+                    + QUIZZES_COULUMN_Q1STATE + " INTEGER, "
+                    + QUIZZES_COULUMN_Q2STATE + " INTEGER, "
+                    + QUIZZES_COULUMN_Q3STATE + " INTEGER, "
+                    + QUIZZES_COULUMN_Q4STATE + " INTEGER, "
+                    + QUIZZES_COULUMN_Q5STATE + " INTEGER, "
+                    + QUIZZES_COULUMN_Q6STATE + " INTEGER "
+                    + ")";
+
+    private databaseHelper(Context context) {
+        super (context, DB_NAME,null, DB_VERSION);
+        this.context1 = context;
     }
 
-    public static synchronized databaseHelper getInstance(Context context){
-        //check if instance already exists
+    public static synchronized databaseHelper getInstance(Context context) {
         if(helperInstance == null){
             helperInstance = new databaseHelper(context.getApplicationContext());
         }
         return helperInstance;
     }
 
+    //Creates a database if one doesn't exist and inserts initial values from csv
     @Override
     public void onCreate(SQLiteDatabase db){
-        //empty because using db created in sqlite studio
+        db.execSQL(CREATE_STATES);
+        Log.d(DEBUG_TAG, "Table " + TB_STATEINFO + "created");
+        db.execSQL(CREATE_QUIZZES);
+        Log.d(DEBUG_TAG, "Table " + TB_QUIZZES + "created");
+        Log.d(DEBUG_TAG, "Inserting Initial Values: ");
+        try {
+            String file = "StateCapitals.csv";
+            AssetManager manager = context1.getAssets();
+            InputStream inStream = null;
+            try {
+                inStream = manager.open(file);
+            } catch (IOException e) {
+                Log.d(DEBUG_TAG, e.getMessage());
+                e.printStackTrace();
+            }
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(inStream));
+            String line = "";
+            Log.d(DEBUG_TAG, "Begining Transaction: Insert initial");
+            db.beginTransaction();
+            try {
+                while ((line = buffer.readLine()) != null) {
+                    Log.d(DEBUG_TAG, "IN LOOP");
+                    String[] colums = line.split(",");
+                    if (colums.length != 4) {
+                        Log.d("CSVParser", "Skipping Bad CSV Row");
+                        continue;
+                    }
+                    Log.d(DEBUG_TAG, "IN LOOP");
+                    ContentValues cv = new ContentValues();
+                    cv.put(STATEINFO_COLUMN_STATE, colums[0].trim());
+                    cv.put(STATEINFO_COLUMN_CAPITOL, colums[1].trim());
+                    cv.put(STATEINFO_COLUMN_SECONDCITY, colums[2].trim());
+                    cv.put(STATEINFO_COLUMN_THIRDCITY, colums[3].trim());
+                    db.insert(TB_STATEINFO, null, cv);
+                }
+                Log.d(DEBUG_TAG, "EXITED LOOP");
+            } catch (IOException e) {
+                Log.d(DEBUG_TAG, e.getMessage());
+                e.printStackTrace();
+            } finally {
+                db.setTransactionSuccessful();
+                db.endTransaction();
+            }
+
+            Log.d(DEBUG_TAG, "Ended transaction: Create DB");
+
+        } catch (Exception e) {
+            Log.d(DEBUG_TAG, e.getMessage());
+        }
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
-        //empty because using a db created in sqlite studio
+        db.execSQL("drop table if exists " + TB_STATEINFO);
+        db.execSQL("drop table if exists " + TB_QUIZZES);
+        onCreate(db);
+        Log.d(DEBUG_TAG, "Table " + TB_STATEINFO + "upgraded");
+        Log.d(DEBUG_TAG, "Table " + TB_QUIZZES + "upgraded");
     }
 
-    @Override
-    public synchronized void close(){
-        if(stateDB!= null){
-            stateDB.close();
-        }
-        super.close();
-    }
 
-    /***
-     * Checks if the database exists on the device or not
-     * @return
-     */
-    public boolean checkDataBase() {
-        SQLiteDatabase tempDB = null;
-        try{
-            String myPath = DB_PATH + DB_NAME;
-            tempDB = SQLiteDatabase.openDatabase(myPath,null,SQLiteDatabase.OPEN_READWRITE);
-        } catch (SQLiteException e) {
-            Log.e("tle99 - check", e.getMessage());
-        }
-        if (tempDB != null){
-            tempDB.close();
-        }
-        return tempDB != null ? true : false;
-    }
-
-    /***
-     * Copies the database from assests to the device
-     * @throws IOException
-     */
-    public void copyDatabase() throws IOException {
-        try{
-            InputStream myInput = context.getAssets().open(DB_NAME);
-            String outputFileName = DB_PATH + DB_NAME;
-            OutputStream myOutput = new FileOutputStream(outputFileName);
-
-            byte[] buffer = new byte[1024];
-            int length;
-
-            while ((length = myInput.read(buffer))>0){
-                myOutput.write(buffer,0,length);
-            }
-
-            myOutput.flush();
-            myOutput.close();
-            myInput.close();
-        } catch (Exception e) {
-            Log.e("tle - copyDatabase", e.getMessage());
-        }
-    }
-
-    /***
-     * Opens the database
-     * @throws SQLException
-     */
-    public void openDB() throws SQLException {
-        String myPath = DB_PATH + DB_NAME;
-        stateDB = SQLiteDatabase.openDatabase(myPath,null,SQLiteDatabase.OPEN_READWRITE);
-    }
-
-    /***
-     * Check if DB exists on the device, creates a new one if necessary
-     * @throws IOException
-     */
-    public void createDatabase() throws IOException {
-        boolean dbExist = checkDataBase();
-
-        if(dbExist){
-
-        } else{
-            this.getReadableDatabase();
-            try{
-                copyDatabase();
-            } catch (IOException e){
-                Log.e("tle99 - create", e.getMessage());
-            }
-        }
-    }
 }

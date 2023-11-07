@@ -21,9 +21,10 @@ public class QuizActivity extends AppCompatActivity {
 
     public final String DEBUG_TAG = "QuizActiviy: ";
     public int score = -1;
+
+    public int[] answers = null;
     public Quiz current;
-    private stateInfoData stateInfoData = null;
-    private List<State> statesList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,17 +34,12 @@ public class QuizActivity extends AppCompatActivity {
         QuizPagerAdapter qpAdapter = new QuizPagerAdapter(getSupportFragmentManager(),getLifecycle());
         quest.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         quest.setAdapter(qpAdapter);
-
-        statesList = new ArrayList<State>();
-
-
-
-
-
         current = generateQuiz();
+        answers = new int[] {0,0,0,0,0,0};
         Log.d(DEBUG_TAG, "Generated Quiz:" + current);
         score = 0;
     }
+
     public Quiz generateQuiz() {
         int[] stateVal = new int[6];
         Random gen = new Random();
@@ -56,7 +52,7 @@ public class QuizActivity extends AppCompatActivity {
                 count++;
             } else {
                 for(int j = 0; j < count; j++){
-                    if(temp == stateVal[j]){
+                    if(temp == stateVal[j] || temp == 1){
                            hasDup = true;
                     }
                 }
@@ -74,20 +70,7 @@ public class QuizActivity extends AppCompatActivity {
 
         return temp;
     }
-    private class stateDBReader extends AsyncTask<Void, List<State>>{
-        @Override
-        protected List<State> doInBackground(Void... params){
-            List<State> statesList = stateInfoData.retrieveAllStates();
 
-            Log.d(DEBUG_TAG, "stateDBRearder: States Retrieved " +statesList.size());
 
-            return statesList;
-        }
 
-        @Override
-        protected void onPostExecute(List<State> stateList){
-            Log.d(DEBUG_TAG, "StateDBReader: stateList.size(): " + stateList.size());
-            statesList.addAll(stateList);
-        }
-    }
 }
