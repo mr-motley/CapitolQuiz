@@ -91,7 +91,7 @@ public class QuestionFragment extends Fragment {
     private class stateDBReader extends AsyncTask<Void, List<State>> {
         @Override
         protected List<State> doInBackground(Void... params) {
-            Log.d(DEBUG_TAG, "Retreiving...");
+            Log.d(DEBUG_TAG, "QFRAG: Retreiving...");
             List<State> statesList = stateInfoData.retrieveAllStates();
 
             Log.d(DEBUG_TAG, "stateDBRearder: States Retrieved " + statesList.size());

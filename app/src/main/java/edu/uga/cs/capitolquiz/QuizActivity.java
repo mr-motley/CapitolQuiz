@@ -25,13 +25,14 @@ public class QuizActivity extends AppCompatActivity {
     public final String DEBUG_TAG = "QuizActiviy: ";
     public int score = -1;
 
+    boolean qstart = false;
     public int[] answers = null;
     public Quiz current;
     private int resId = -1;
 
     private StateInfoData stateInfoData = null;
 
-    private List<Quiz> quizList;
+    private List<Quiz> quizList =null;
     public ViewPager2 quest = null;
 
     @Override
@@ -41,6 +42,7 @@ public class QuizActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled( true );
+        quizList = new ArrayList<Quiz>();
         quest = findViewById(R.id.viewpager);
         QuizPagerAdapter qpAdapter = new QuizPagerAdapter(getSupportFragmentManager(),getLifecycle());
         quest.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
@@ -99,7 +101,13 @@ public class QuizActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
+        qstart = true;
         current.setCurrentQ(quest.getCurrentItem());
+        int tempScore = 0;
+        for(int i =0; i < answers.length; i++){
+            tempScore += answers[i];
+        }
+        current.setResult(tempScore);
         stateInfoData = new StateInfoData(getApplicationContext());
         stateInfoData.open();
         new quizDBWriter().execute(current);
@@ -108,11 +116,12 @@ public class QuizActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        stateInfoData = new StateInfoData(getApplicationContext());
-        stateInfoData.open();
-        new QuizDBReader().execute();
-        current = quizList.get(resId);
-        quest.setCurrentItem(current.getCurrentQ());
+        if(qstart) {
+            stateInfoData = new StateInfoData(getApplicationContext());
+            stateInfoData.open();
+            new QuizDBReader().execute();
+        }
+
     }
 
     private class quizDBWriter extends AsyncTask<Quiz, Quiz> {
@@ -144,8 +153,11 @@ public class QuizActivity extends AppCompatActivity {
         protected void onPostExecute(List<Quiz> qList) {
             Log.d(DEBUG_TAG, "QuizDBReader: quizList.size(): " + quizList.size());
             quizList.addAll(qList);
-
             stateInfoData.close();
+            current = quizList.get(resId-1);
+            answers = new int[]{current.getResult(), 0, 0, 0, 0, 0};
+            quest.setCurrentItem(current.getCurrentQ());
+            qstart = false;
         }
     }
 

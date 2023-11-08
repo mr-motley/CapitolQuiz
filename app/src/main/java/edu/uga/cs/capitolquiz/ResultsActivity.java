@@ -58,7 +58,11 @@ public class ResultsActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<Quiz> qList) {
             Log.d(DEBUG_TAG, "QuizDBReader: quizList.size(): " + quizList.size());
-            quizList.addAll(qList);
+            for(int i = 0; i < qList.size(); i++){
+                if(qList.get(i).getCurrentQ() > 5){
+                    quizList.add(qList.get(i));
+                }
+            }
 
             //create recyclerAdapter and set it
             recyclerAdapter = new QuizRecyclerAdapter(getApplicationContext(), quizList);
