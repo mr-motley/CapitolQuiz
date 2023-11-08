@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.opencsv.CSVReader;
+
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -45,6 +47,7 @@ public class databaseHelper extends SQLiteOpenHelper {
     public static final String QUIZZES_COULUMN_Q4STATE = "q4State";
     public static final String QUIZZES_COULUMN_Q5STATE = "q5State";
     public static final String QUIZZES_COULUMN_Q6STATE = "q6State";
+    public static final String QUIZZES_COlUMN_CURRENTQ = "currentQ";
     public static final String TB_QUIZZES = "quizzes";
 
     private static databaseHelper helperInstance;
@@ -69,7 +72,8 @@ public class databaseHelper extends SQLiteOpenHelper {
                     + QUIZZES_COULUMN_Q3STATE + " INTEGER, "
                     + QUIZZES_COULUMN_Q4STATE + " INTEGER, "
                     + QUIZZES_COULUMN_Q5STATE + " INTEGER, "
-                    + QUIZZES_COULUMN_Q6STATE + " INTEGER "
+                    + QUIZZES_COULUMN_Q6STATE + " INTEGER, "
+                    + QUIZZES_COlUMN_CURRENTQ + " INTEGER "
                     + ")";
 
     private databaseHelper(Context context) {
@@ -93,49 +97,22 @@ public class databaseHelper extends SQLiteOpenHelper {
         Log.d(DEBUG_TAG, "Table " + TB_QUIZZES + "created");
         Log.d(DEBUG_TAG, "Inserting Initial Values: ");
         try {
-            String file = "StateCapitals.csv";
-            AssetManager manager = context1.getAssets();
-            InputStream inStream = null;
-            try {
-                inStream = manager.open(file);
-            } catch (IOException e) {
-                Log.d(DEBUG_TAG, e.getMessage());
-                e.printStackTrace();
+            InputStream in_s = context1.getAssets().open("StateCapitals.csv");
+            CSVReader reader = new CSVReader(new InputStreamReader(in_s));
+            String[] nextRow;
+            while( (nextRow = reader.readNext() ) != null){
+                ContentValues cv = new ContentValues();
+                cv.put(databaseHelper.STATEINFO_COLUMN_STATE, nextRow[0].trim());
+                cv.put(databaseHelper.STATEINFO_COLUMN_CAPITOL, nextRow[1].trim());
+                cv.put(databaseHelper.STATEINFO_COLUMN_SECONDCITY, nextRow[2].trim());
+                cv.put(databaseHelper.STATEINFO_COLUMN_THIRDCITY, nextRow[3].trim());
+                db.insert(databaseHelper.TB_STATEINFO, null, cv);
             }
-            BufferedReader buffer = new BufferedReader(new InputStreamReader(inStream));
-            String line = "";
-            Log.d(DEBUG_TAG, "Begining Transaction: Insert initial");
-            db.beginTransaction();
-            try {
-                while ((line = buffer.readLine()) != null) {
-                    Log.d(DEBUG_TAG, "IN LOOP");
-                    String[] colums = line.split(",");
-                    if (colums.length != 4) {
-                        Log.d("CSVParser", "Skipping Bad CSV Row");
-                        continue;
-                    }
-                    Log.d(DEBUG_TAG, "IN LOOP");
-                    ContentValues cv = new ContentValues();
-                    cv.put(STATEINFO_COLUMN_STATE, colums[0].trim());
-                    cv.put(STATEINFO_COLUMN_CAPITOL, colums[1].trim());
-                    cv.put(STATEINFO_COLUMN_SECONDCITY, colums[2].trim());
-                    cv.put(STATEINFO_COLUMN_THIRDCITY, colums[3].trim());
-                    db.insert(TB_STATEINFO, null, cv);
-                }
-                Log.d(DEBUG_TAG, "EXITED LOOP");
-            } catch (IOException e) {
-                Log.d(DEBUG_TAG, e.getMessage());
-                e.printStackTrace();
-            } finally {
+        } catch (Exception e){
+            Log.d(DEBUG_TAG, "csv read unsuccessful: " + e.getMessage());
+        }
                 db.setTransactionSuccessful();
                 db.endTransaction();
-            }
-
-            Log.d(DEBUG_TAG, "Ended transaction: Create DB");
-
-        } catch (Exception e) {
-            Log.d(DEBUG_TAG, e.getMessage());
-        }
     }
 
     @Override

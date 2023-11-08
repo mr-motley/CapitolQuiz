@@ -1,6 +1,5 @@
 package edu.uga.cs.capitolquiz;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -26,7 +25,7 @@ public class QuestionFragment extends Fragment {
 
     private static final String DEBUG_TAG = "Question Fragment";
     private int questionNum;
-    private stateInfoData stateInfoData = null;
+    private StateInfoData stateInfoData = null;
     private List<State> statesList;
 
     private TextView prompt;
@@ -82,7 +81,7 @@ public class QuestionFragment extends Fragment {
 
 
         statesList = new ArrayList<State>();
-        stateInfoData = new stateInfoData(getActivity());
+        stateInfoData = new StateInfoData(getActivity());
         stateInfoData.open();
         //stateInfoData.populateDB(getActivity());
         Log.d(DEBUG_TAG, "Executing DB Read");
@@ -144,6 +143,7 @@ public class QuestionFragment extends Fragment {
                 ans2.setText(temp.getSecondCity());
                 ans3.setText(temp.getThirdCity());
             }
+            stateInfoData.close();
 
         }
     }
@@ -153,7 +153,6 @@ public class QuestionFragment extends Fragment {
             .OnCheckedChangeListener {
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedID){
-            Log.d(DEBUG_TAG, "CheckedId: " + checkedID + " ExpectedId: " + ans1.getId());
             if( questionNum == 0){
                 Log.d(DEBUG_TAG, "inside if");
                 if(checkedID == ans1.getId()){
@@ -171,19 +170,26 @@ public class QuestionFragment extends Fragment {
                 }
             }else if( questionNum == 2){
                 Log.d(DEBUG_TAG, "inside if");
+                if(checkedID == R.id.radioButton){
+                    qz.answers[2] = 1;
+                }else {
+                    qz.answers[2] = 0;
+                }
+            } else if( questionNum == 3){
+                Log.d(DEBUG_TAG, "inside if");
                 if(checkedID == R.id.radioButton3){
                     qz.answers[3] = 1;
                 }else {
                     qz.answers[3] = 0;
                 }
-            } else if( questionNum == 3){
+            } else if( questionNum == 4){
                 Log.d(DEBUG_TAG, "inside if");
                 if(checkedID == R.id.radioButton){
                     qz.answers[4] = 1;
                 }else {
                     qz.answers[4] = 0;
                 }
-            } else if( questionNum == 4){
+            } else if (questionNum == 5) {
                 Log.d(DEBUG_TAG, "inside if");
                 if(checkedID == R.id.radioButton){
                     qz.answers[5] = 1;

@@ -1,6 +1,7 @@
 package edu.uga.cs.capitolquiz;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;

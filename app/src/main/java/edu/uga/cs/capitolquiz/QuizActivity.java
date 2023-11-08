@@ -2,11 +2,14 @@ package edu.uga.cs.capitolquiz;
 
 import static com.google.android.material.internal.ContextUtils.getActivity;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -24,13 +27,21 @@ public class QuizActivity extends AppCompatActivity {
 
     public int[] answers = null;
     public Quiz current;
+    private int resId = -1;
 
+    private StateInfoData stateInfoData = null;
+
+    private List<Quiz> quizList;
+    public ViewPager2 quest = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
-        ViewPager2 quest = findViewById(R.id.viewpager);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+            actionBar.setDisplayHomeAsUpEnabled( true );
+        quest = findViewById(R.id.viewpager);
         QuizPagerAdapter qpAdapter = new QuizPagerAdapter(getSupportFragmentManager(),getLifecycle());
         quest.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         quest.setAdapter(qpAdapter);
@@ -66,11 +77,76 @@ public class QuizActivity extends AppCompatActivity {
         Date date = Calendar.getInstance().getTime();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
         String strDate = dateFormat.format(date);
-        Quiz temp = new Quiz(0,strDate, stateVal);
-
+        Quiz temp = new Quiz(0,strDate, stateVal,0);
         return temp;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Implement Back button listener method.
+        // This method may be used for other actions from the ActionBar menu, if provided in the layout.
+        int id = item.getItemId();
 
+        // android.R.id.home is the built-in designation of the back button widget.
+        if( id == android.R.id.home ) {
+            onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected( item );
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        current.setCurrentQ(quest.getCurrentItem());
+        stateInfoData = new StateInfoData(getApplicationContext());
+        stateInfoData.open();
+        new quizDBWriter().execute(current);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        stateInfoData = new StateInfoData(getApplicationContext());
+        stateInfoData.open();
+        new QuizDBReader().execute();
+        current = quizList.get(resId);
+        quest.setCurrentItem(current.getCurrentQ());
+    }
+
+    private class quizDBWriter extends AsyncTask<Quiz, Quiz> {
+        @Override
+        protected Quiz doInBackground(Quiz... quizzes){
+            stateInfoData.storeQuiz(quizzes[0]);
+            return quizzes[0];
+        }
+
+        @Override
+        protected void onPostExecute(Quiz quiz){
+            resId = (int) quiz.getId();
+            stateInfoData.close();
+        }
+    }
+
+    private class QuizDBReader extends AsyncTask<Void, List<Quiz>> {
+        @Override
+        protected List<Quiz> doInBackground(Void... params) {
+            Log.d(DEBUG_TAG, "Retreiving...");
+            List<Quiz> quizList = stateInfoData.retrieveAllQuizzes();
+
+            Log.d(DEBUG_TAG, "stateDBReader: Quizzes Retrieved " + quizList.size());
+
+            return quizList;
+        }
+
+        @Override
+        protected void onPostExecute(List<Quiz> qList) {
+            Log.d(DEBUG_TAG, "QuizDBReader: quizList.size(): " + quizList.size());
+            quizList.addAll(qList);
+
+            stateInfoData.close();
+        }
+    }
 
 }

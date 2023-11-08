@@ -10,6 +10,7 @@ public class Quiz {
     private int q5State;
     private int q6State;
     private String quizDate;
+    private int currentQ;
 
     public Quiz(){
         this.id = -1;
@@ -21,6 +22,7 @@ public class Quiz {
         this.q4State = -1;
         this.q5State = -1;
         this.q6State = -1;
+        this.currentQ = -1;
     }
 
     public Quiz(int result, String quizDate){
@@ -28,7 +30,7 @@ public class Quiz {
         this.result = result;
         this.quizDate = quizDate;
     }
-    public Quiz(int result, String quizDate, int[] states){
+    public Quiz(int result, String quizDate, int[] states, int currentQ){
         this.id = -1;
         this.result = result;
         this.quizDate = quizDate;
@@ -38,6 +40,7 @@ public class Quiz {
         this.q4State = states[3];
         this.q5State = states[4];
         this.q6State = states[5];
+        this.currentQ = currentQ;
     }
 
     public long getId() {return id;}
@@ -59,9 +62,11 @@ public class Quiz {
     public void setQ5State(int q5){ this.q5State = q5;}
     public int getQ6State() {return q6State;}
     public void setQ6State(int q6){ this.q6State = q6;}
+    public int getCurrentQ() {return currentQ;}
+    public void setCurrentQ(int currentQ) {this.currentQ =currentQ;}
 
 
     public String toString(){
-        return id + ": " + result + " " + q1State+ " " + q2State+ " " +q3State+ " " +q4State+ " " +q5State+ " " +q6State+ " " + quizDate;
+        return id + "| Score: " + result + " Date: " + quizDate;
     }
 }

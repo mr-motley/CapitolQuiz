@@ -23,7 +23,7 @@ import java.util.List;
 public class ResultFragment extends Fragment {
 
     public static final String DEBUG_TAG = "Result Fragment: ";
-    private stateInfoData stateInfoData = null;
+    private StateInfoData stateInfoData = null;
 
     private List<Quiz> quizList;
     public ResultFragment() {
@@ -69,10 +69,11 @@ public class ResultFragment extends Fragment {
             result += qz.answers[i];
         }
         res.setText("Result: " + result + "/6");
+        qz.current.setResult(result);
         Log.d(DEBUG_TAG, "Quiz Value: " + qz.current);
-//        stateInfoData = new stateInfoData(getActivity());
-//        stateInfoData.open();
-//        new quizDBWriter().execute(qz.current);
+        stateInfoData = new StateInfoData(getActivity());
+        stateInfoData.open();
+        new quizDBWriter().execute(qz.current);
     }
 
     private class returnOnClickListener implements View.OnClickListener {
@@ -92,7 +93,7 @@ public class ResultFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Quiz quiz){
-        quizList.add(quiz);
+            stateInfoData.close();
         }
     }
 
