@@ -28,6 +28,7 @@ public class ResultsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
+        //create action bar and recyclerview
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled( true );
@@ -35,16 +36,23 @@ public class ResultsActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        //create list to store quizes
         quizList = new ArrayList<Quiz>();
 
+        //create and open instance of dataAccess class
         stateInfoData = new StateInfoData(getApplicationContext());
-
         stateInfoData.open();
 
+        //call async reader
         new QuizDBReader().execute();
     }
 
     private class QuizDBReader extends AsyncTask<Void, List<Quiz>> {
+        /**
+         * Reads the database in the backround, retrieves all quizzes and stores them in a list
+         * @param params
+         * @return quizList
+         */
         @Override
         protected List<Quiz> doInBackground(Void... params) {
             Log.d(DEBUG_TAG, "Retreiving...");
@@ -55,10 +63,15 @@ public class ResultsActivity extends AppCompatActivity {
             return quizList;
         }
 
+        /**
+         * Reads the list of quizzes and adds completed quizzes a list
+         * @param qList
+         */
         @Override
         protected void onPostExecute(List<Quiz> qList) {
             Log.d(DEBUG_TAG, "QuizDBReader: quizList.size(): " + quizList.size());
             for(int i = 0; i < qList.size(); i++){
+                //get completed quizzes (answered more than 5 i.e. all 6 questions)
                 if(qList.get(i).getCurrentQ() > 5){
                     quizList.add(qList.get(i));
                 }

@@ -20,6 +20,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * This class represents the activity that hosts the quiz to be taken.
+ */
 public class QuizActivity extends AppCompatActivity {
 
     public final String DEBUG_TAG = "QuizActiviy: ";
@@ -39,14 +42,18 @@ public class QuizActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
+        //add actionbar
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled( true );
+        //create list
         quizList = new ArrayList<Quiz>();
+        //set up viewPager for the question fragments
         quest = findViewById(R.id.viewpager);
         QuizPagerAdapter qpAdapter = new QuizPagerAdapter(getSupportFragmentManager(),getLifecycle());
         quest.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         quest.setAdapter(qpAdapter);
+        //generate a quiz with random questions
         current = generateQuiz();
         answers = new int[] {0,0,0,0,0,0};
         Log.d(DEBUG_TAG, "Generated Quiz:" + current);
@@ -58,6 +65,7 @@ public class QuizActivity extends AppCompatActivity {
         Random gen = new Random();
         int count = 0;
         boolean hasDup = false;
+        //Generate random values for the Question ID, ensuring no duplicates
         while(count < 6) {
             int temp = gen.nextInt(50);
             if(count == 0) {
@@ -76,9 +84,11 @@ public class QuizActivity extends AppCompatActivity {
             }
 
         }
+        //retrieve and format the date
         Date date = Calendar.getInstance().getTime();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
         String strDate = dateFormat.format(date);
+        //construct quiz
         Quiz temp = new Quiz(0,strDate, stateVal,0);
         return temp;
     }
@@ -102,20 +112,25 @@ public class QuizActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         qstart = true;
+        //set the current question
         current.setCurrentQ(quest.getCurrentItem());
+        //calculate current score
         int tempScore = 0;
         for(int i =0; i < answers.length; i++){
             tempScore += answers[i];
         }
         current.setResult(tempScore);
+        //create and open data access class
         stateInfoData = new StateInfoData(getApplicationContext());
-        stateInfoData.open();
+
+        //write in-progress quiz to the DB
         new quizDBWriter().execute(current);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        //retrieve incomplete quiz from DB if extant
         if(qstart) {
             stateInfoData = new StateInfoData(getApplicationContext());
             stateInfoData.open();
@@ -133,6 +148,7 @@ public class QuizActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Quiz quiz){
+            //save the quiz ID so it can be retieved
             resId = (int) quiz.getId();
             stateInfoData.close();
         }
@@ -154,8 +170,10 @@ public class QuizActivity extends AppCompatActivity {
             Log.d(DEBUG_TAG, "QuizDBReader: quizList.size(): " + quizList.size());
             quizList.addAll(qList);
             stateInfoData.close();
+            //retrieve only the quiz that was in progress when interrupted
             current = quizList.get(resId-1);
             answers = new int[]{current.getResult(), 0, 0, 0, 0, 0};
+            //set the current quiz as the retrieved quiz
             quest.setCurrentItem(current.getCurrentQ());
             qstart = false;
         }

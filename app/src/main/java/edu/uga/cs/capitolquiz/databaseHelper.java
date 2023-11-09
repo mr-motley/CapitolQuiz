@@ -111,8 +111,6 @@ public class databaseHelper extends SQLiteOpenHelper {
         } catch (Exception e){
             Log.d(DEBUG_TAG, "csv read unsuccessful: " + e.getMessage());
         }
-                db.setTransactionSuccessful();
-                db.endTransaction();
     }
 
     @Override

@@ -1,5 +1,8 @@
 package edu.uga.cs.capitolquiz;
 
+/**
+ * This is a POJO class that represents a Quiz object.
+ */
 public class Quiz {
     private long id;
     private int result;

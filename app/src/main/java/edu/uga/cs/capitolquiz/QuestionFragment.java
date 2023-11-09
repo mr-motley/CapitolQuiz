@@ -72,6 +72,7 @@ public class QuestionFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //connect values to their layout items
         prompt = view.findViewById(R.id.textView3);
         ans1 = view.findViewById(R.id.radioButton);
         ans2 = view.findViewById(R.id.radioButton2);
@@ -79,7 +80,7 @@ public class QuestionFragment extends Fragment {
         group = view.findViewById(R.id.group);
         group.setOnCheckedChangeListener(new ansOnCheckedListener());
 
-
+        //read the states from the database
         statesList = new ArrayList<State>();
         stateInfoData = new StateInfoData(getActivity());
         stateInfoData.open();
@@ -106,6 +107,7 @@ public class QuestionFragment extends Fragment {
 
             State temp = null;
             Log.d(DEBUG_TAG, "StatesList: " + statesList.size());
+            //Display the questions according to position and using the info from the correct state
             if(questionNum == 0){
                 temp = statesList.get(qz.current.getQ1State());
                 prompt.setText("What is the Capitol of " + temp.getState());
@@ -153,6 +155,7 @@ public class QuestionFragment extends Fragment {
             .OnCheckedChangeListener {
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedID){
+            //check if the selected answer is correct and update score in real time
             if( questionNum == 0){
                 Log.d(DEBUG_TAG, "inside if");
                 if(checkedID == ans1.getId()){

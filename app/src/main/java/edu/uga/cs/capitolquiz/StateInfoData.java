@@ -175,6 +175,7 @@ public class StateInfoData {
     }
 
     public Quiz storeQuiz( Quiz quiz) {
+        //prepare SQL statement for storing quiz
         ContentValues values = new ContentValues();
         values.put(databaseHelper.QUIZZES_COLUMN_QUIZDATE, quiz.getQuizDate());
         values.put(databaseHelper.QUIZZES_COLUMN_RESULT, quiz.getResult());
@@ -198,6 +199,8 @@ public class StateInfoData {
     }
 
     public void populateDB(Context context) {
+        //legacy method for inserting the values from the CSV in case it did not occur properly on startup,
+        //for testing purposes only
         Log.d(DEBUG_TAG, "Inserting Initial Values: ");
         try {
             InputStream in_s = context.getAssets().open("StateCapitals.csv");
